@@ -58,6 +58,13 @@ public class TYT {
         device.shell(String.format("input swipe %d %d %d %d %d", LX, LY, LX, LY, delay));
     }
 
+    /**
+     * 判断是否为目标色，包含误差dim
+     * @param source
+     * @param dst
+     * @param dim
+     * @return
+     */
     private static boolean isColor(int source, int dst, int dim) {
         Color currColor = new Color(source);
         Color tmpColor = new Color(dst);
@@ -66,16 +73,28 @@ public class TYT {
 
     }
 
+
+    /**
+     * 判断是否为跳一跳棋子
+     * @param dst
+     * @return
+     */
     private static boolean isTYT(int dst) {
         Color currColor = new Color(TYT_COLOR);
         Color tmpColor = new Color(dst);
 
         return Math.abs(currColor.getRed() - tmpColor.getRed()) <= 20 && Math.abs(currColor.getBlue() - tmpColor.getBlue()) <= 60 && Math.abs(currColor.getGreen() - tmpColor.getGreen()) <= 20;
-
-
     }
 
 
+    /**
+     * 判断是否为跳一跳棋子
+     * @param image
+     * @param x
+     * @param y
+     * @param backGroud
+     * @return
+     */
     private static boolean isTYT(BufferedImage image, int x, int y, int backGroud) {
 
         if (!isTYT(image.getRGB(x, y)))
@@ -92,7 +111,12 @@ public class TYT {
 
     private static int COUNTER = 0;
 
-    private static Point getPonitByColor(int currRGB) throws Exception {
+    /**
+     * 获取
+     * @return
+     * @throws Exception
+     */
+    private static Point getTYTPonit() throws Exception {
         Point point = new Point(0, 0);
 
         COUNTER++;
@@ -102,8 +126,8 @@ public class TYT {
         boolean found = false;
         for (int i = 1300; i > 1000; i -= 2) {
             for (int j = 150; j < 950; j += 2) {
-                if (isColor(currRGB, image.getRGB(j, i), 15)) {
-                    if (isColor(currRGB, image.getRGB(j, i - 20), 20)) {
+                if (isColor(TYT_COLOR, image.getRGB(j, i), 15)) {
+                    if (isColor(TYT_COLOR, image.getRGB(j, i - 20), 20)) {
                         found = true;
                         System.out.println("TYT_X:" + j + ",TYT_Y:" + i);
                         return new Point(j, i);
@@ -120,6 +144,11 @@ public class TYT {
     }
 
 
+    /**
+     * 获取目标坐标
+     * @return
+     * @throws Exception
+     */
     private static Point getDstPoint() throws Exception {
         IChimpImage iChimpImage = device.takeSnapshot();
         BufferedImage image = iChimpImage.getBufferedImage();
@@ -130,11 +159,13 @@ public class TYT {
         int startX = 0;
         int startY = 0;
         int tmp;
+        //下述代码获取目标平面顶点坐标
         Map<Integer, Boolean> isTYT = new HashMap<Integer, Boolean>();
         for (int i = 500; i < 1000; i += 2) {
             for (int j = 150; j < 1000; j += 2) {
                 if (null != isTYT.get(j)) continue;
 
+                //防止跳一跳棋子超过目标平面
                 tmp = image.getRGB(j, i);
                 if (isTYT(image, j, i, backGroundColor)) {
                     isTYT.put(j, true);
@@ -159,8 +190,9 @@ public class TYT {
 
         int centX = 0;
         int centY = 0;
-        if (start) {
 
+        //下述代码获取目标平面底点坐标
+        if (start) {
             System.out.println("process:" + COUNTER);
             System.out.println("startX:" + startX + ",startY:" + startY);
 
@@ -205,12 +237,18 @@ public class TYT {
             }
         }
 
-
         System.out.println("centX:" + centX + ",centY:" + centY);
 
         return new Point(centX, centY);
     }
 
+    /**
+     * 判断是否为顶部（增强）
+     * @param image
+     * @param x
+     * @param y
+     * @return
+     */
     private static boolean isTop(BufferedImage image, int x, int y) {
         int count = 0;
         int sourceColor = image.getRGB(x, y);
@@ -230,6 +268,10 @@ public class TYT {
 
     private static final int TYT_COLOR = 0x3a3a66;
 
+    /**
+     * 休息
+     * @param sleepMS
+     */
     private static void sleep(long sleepMS) {
         try {
             Thread.sleep(sleepMS);
@@ -239,6 +281,9 @@ public class TYT {
     }
 
 
+    /**
+     * 失败继续
+     */
     private static void fail() {
         IChimpImage iChimpImage = device.takeSnapshot();
         iChimpImage.writeToFile("pic/fail.png", "PNG");
@@ -255,13 +300,26 @@ public class TYT {
 
 
     /**
+     * 检测屏幕
+     */
+    private static void checkScreen()
+    {
+        IChimpImage iChimpImage = device.takeSnapshot();
+        BufferedImage image = iChimpImage.getBufferedImage();
+
+
+        System.out.println(image.getHeight() + " " + image.getWidth());
+    }
+
+    /**
      * ADB后台进程
      */
     public static void main(String[] args) throws Exception {
+//        checkScreen();
 
         while (true) {
             sleep(3000);
-            Point tytPoint = getPonitByColor(TYT_COLOR);
+            Point tytPoint = getTYTPonit();
             Point dstPoint = getDstPoint();
 
             jump(tytPoint, dstPoint);
@@ -269,5 +327,6 @@ public class TYT {
             //挂了检测重来
             fail();
         }
+
     }
 }
