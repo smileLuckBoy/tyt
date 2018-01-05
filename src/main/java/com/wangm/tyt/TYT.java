@@ -60,6 +60,7 @@ public class TYT {
 
     /**
      * 判断是否为目标色，包含误差dim
+     *
      * @param source
      * @param dst
      * @param dim
@@ -76,6 +77,7 @@ public class TYT {
 
     /**
      * 判断是否为跳一跳棋子
+     *
      * @param dst
      * @return
      */
@@ -89,6 +91,7 @@ public class TYT {
 
     /**
      * 判断是否为跳一跳棋子
+     *
      * @param image
      * @param x
      * @param y
@@ -113,6 +116,7 @@ public class TYT {
 
     /**
      * 获取
+     *
      * @return
      * @throws Exception
      */
@@ -121,6 +125,7 @@ public class TYT {
 
         COUNTER++;
         IChimpImage iChimpImage = device.takeSnapshot();
+        iChimpImage.writeToFile("pic/TYT" + COUNTER + ".png", "PNG");
         BufferedImage image = iChimpImage.createBufferedImage();
 
         boolean found = false;
@@ -146,12 +151,14 @@ public class TYT {
 
     /**
      * 获取目标坐标
+     *
      * @return
      * @throws Exception
      */
     private static Point getDstPoint() throws Exception {
         IChimpImage iChimpImage = device.takeSnapshot();
         BufferedImage image = iChimpImage.getBufferedImage();
+//        BufferedImage image = ImageIO.read(new FileInputStream(new File("pic/TYT100.png")));
         int backGroundColor = image.getRGB(500, 200);
 
         int dstColor = 0;
@@ -244,6 +251,7 @@ public class TYT {
 
     /**
      * 判断是否为顶部（增强）
+     *
      * @param image
      * @param x
      * @param y
@@ -270,6 +278,7 @@ public class TYT {
 
     /**
      * 休息
+     *
      * @param sleepMS
      */
     private static void sleep(long sleepMS) {
@@ -302,8 +311,7 @@ public class TYT {
     /**
      * 检测屏幕
      */
-    private static void checkScreen()
-    {
+    private static void checkScreen() {
         IChimpImage iChimpImage = device.takeSnapshot();
         BufferedImage image = iChimpImage.getBufferedImage();
 
@@ -316,6 +324,7 @@ public class TYT {
      */
     public static void main(String[] args) throws Exception {
 //        checkScreen();
+//        getDstPoint();
 
         while (true) {
             sleep(3000);
