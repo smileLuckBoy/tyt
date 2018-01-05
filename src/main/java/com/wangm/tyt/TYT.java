@@ -97,7 +97,6 @@ public class TYT {
 
         COUNTER++;
         IChimpImage iChimpImage = device.takeSnapshot();
-        iChimpImage.writeToFile("pic/TYT" + COUNTER + ".png", "PNG");
         BufferedImage image = iChimpImage.createBufferedImage();
 
         boolean found = false;
